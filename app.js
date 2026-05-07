@@ -198,6 +198,8 @@ const setConfigs = [
 let currentSetId = 1;
 let questions = [];
 let autoSaveTimer = null;
+let storageWritable = true;
+const memoryRecords = {};
 
 function numericQuestion(text, answer) {
   return { text, answer: String(answer), inputMode: "numeric" };
@@ -227,11 +229,52 @@ function seededRandom(seed) {
 }
 
 function readJson(key) {
-  try {
-    return JSON.parse(localStorage.getItem(key));
-  } catch {
-    return null;
+  if (!storageWritable && Object.prototype.hasOwnProperty.call(memoryRecords, key)) {
+    return memoryRecords[key];
   }
+
+  try {
+    const item = localStorage.getItem(key);
+    if (item === null) {
+      return memoryRecords[key] || null;
+    }
+    const parsed = JSON.parse(item);
+    memoryRecords[key] = parsed;
+    return parsed;
+  } catch {
+    storageWritable = false;
+    return memoryRecords[key] || null;
+  }
+}
+
+function writeJson(key, value) {
+  memoryRecords[key] = value;
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    storageWritable = true;
+    return true;
+  } catch {
+    storageWritable = false;
+    return false;
+  }
+}
+
+function removeJson(key) {
+  delete memoryRecords[key];
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    storageWritable = false;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function unpackProgress(record) {
@@ -245,7 +288,7 @@ function getRecordTime(record) {
 function cleanupExpiredTemp() {
   const temp = readJson(TEMP_KEY);
   if (temp?.updatedAt && Date.now() - temp.updatedAt > TEMP_MAX_AGE) {
-    localStorage.removeItem(TEMP_KEY);
+    removeJson(TEMP_KEY);
   }
 }
 
@@ -262,12 +305,12 @@ function loadProgress() {
 }
 
 function saveProgress(progress) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ updatedAt: Date.now(), sets: progress }));
+  return writeJson(STORAGE_KEY, { updatedAt: Date.now(), sets: progress });
 }
 
 function saveTemp(progress = loadProgress()) {
-  localStorage.setItem(TEMP_KEY, JSON.stringify({ updatedAt: Date.now(), sets: progress }));
-  updateSaveStatus("บันทึกล่าสุดแล้ว");
+  const saved = writeJson(TEMP_KEY, { updatedAt: Date.now(), sets: progress });
+  updateSaveStatus(saved && storageWritable ? "บันทึกล่าสุดแล้ว" : "บันทึกถาวรไม่ได้ ใช้ข้อมูลชั่วคราวในหน่วยความจำ");
 }
 
 function getSetProgress(setId) {
@@ -624,9 +667,9 @@ function renderWrongList(wrongRows) {
       <h3>ข้อที่ผิดและคำตอบที่ถูก</h3>
       ${wrongRows.map(({ question, value }) => `
         <div>
-          <span>ข้อ ${question.number}</span>
-          <p>${question.text}</p>
-          <p>ตอบ: ${value || "-"} · คำตอบที่ถูก: <strong>${question.answer}</strong></p>
+          <span>ข้อ ${escapeHtml(question.number)}</span>
+          <p>${escapeHtml(question.text)}</p>
+          <p>ตอบ: ${escapeHtml(value || "-")} · คำตอบที่ถูก: <strong>${escapeHtml(question.answer)}</strong></p>
         </div>
       `).join("")}
     </div>
@@ -641,10 +684,10 @@ function buildPrintableReport(config) {
     const correct = isCorrect(question, value);
     return `
       <tr>
-        <td>${question.number}</td>
-        <td>${question.text}</td>
-        <td>${value || "-"}</td>
-        <td>${question.answer}</td>
+        <td>${escapeHtml(question.number)}</td>
+        <td>${escapeHtml(question.text)}</td>
+        <td>${escapeHtml(value || "-")}</td>
+        <td>${escapeHtml(question.answer)}</td>
         <td>${correct ? "ถูก" : "ผิด"}</td>
       </tr>
     `;
@@ -652,9 +695,9 @@ function buildPrintableReport(config) {
 
   printReport.innerHTML = `
     <h1>รายงานผลแบบฝึกคณิตศาสตร์ ป.1</h1>
-    <p>ชุดที่ ${config.id}: ${config.title}</p>
-    <p>${config.detail}</p>
-    <p>คะแนน ${completion.correct}/${QUESTION_COUNT} · ผิด ${completion.wrong} ข้อ · วันที่ ${new Date().toLocaleString("th-TH")}</p>
+    <p>ชุดที่ ${escapeHtml(config.id)}: ${escapeHtml(config.title)}</p>
+    <p>${escapeHtml(config.detail)}</p>
+    <p>คะแนน ${escapeHtml(completion.correct)}/${QUESTION_COUNT} · ผิด ${escapeHtml(completion.wrong)} ข้อ · วันที่ ${escapeHtml(new Date().toLocaleString("th-TH"))}</p>
     <table>
       <thead>
         <tr>
@@ -670,6 +713,37 @@ function buildPrintableReport(config) {
   `;
 }
 
+function markExportedAfterConfirmation(config) {
+  if (!window.confirm("บันทึกหรือพิมพ์ PDF เรียบร้อยแล้วใช่ไหม")) {
+    updateSaveStatus("ยังไม่บันทึกสถานะ Export PDF");
+    return;
+  }
+
+  const setProgress = getSetProgress(config.id);
+  updateSetProgress(config.id, {
+    ...setProgress,
+    exported: true,
+    exportedAt: Date.now()
+  });
+  refreshPracticeStats(config);
+  updateSaveStatus("บันทึกสถานะ Export PDF แล้ว");
+}
+
+function printThenConfirmExport(config) {
+  let handled = false;
+  const handlePrintClosed = () => {
+    if (handled) {
+      return;
+    }
+    handled = true;
+    window.removeEventListener("afterprint", handlePrintClosed);
+    markExportedAfterConfirmation(config);
+  };
+
+  window.addEventListener("afterprint", handlePrintClosed, { once: true });
+  window.print();
+}
+
 function exportCurrentSet(config) {
   const setProgress = getSetProgress(config.id);
   const completion = getCompletion(config, setProgress);
@@ -679,14 +753,8 @@ function exportCurrentSet(config) {
   }
 
   buildPrintableReport(config);
-  updateSetProgress(config.id, {
-    ...setProgress,
-    exported: true,
-    exportedAt: Date.now()
-  });
-  saveTemp(loadProgress());
-  refreshPracticeStats(config);
-  window.print();
+  updateSaveStatus("กำลังเปิดหน้าต่างพิมพ์ PDF");
+  printThenConfirmExport(config);
 }
 
 function updateSaveStatus(message) {
