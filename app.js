@@ -2,6 +2,7 @@ const app = document.querySelector("#app");
 const homeTemplate = document.querySelector("#homeTemplate");
 const practiceTemplate = document.querySelector("#practiceTemplate");
 const printReport = document.querySelector("#printReport");
+const navToggle = document.querySelector("#navToggle");
 
 const STORAGE_KEY = "math-garden-grade-1-progress-v3";
 const TEMP_KEY = "math-garden-grade-1-temp-v3";
@@ -316,6 +317,8 @@ function saveTemp(progress = loadProgress()) {
 
 function setPracticeChromeActive(active) {
   document.body.classList.toggle("practice-active", active);
+  document.body.classList.remove("nav-open");
+  navToggle?.setAttribute("aria-expanded", "false");
   if (controlBandResizeObserver) {
     controlBandResizeObserver.disconnect();
     controlBandResizeObserver = null;
@@ -820,6 +823,16 @@ function updateActiveNav(hash) {
   });
 }
 
+function toggleMobileNav() {
+  const opened = document.body.classList.toggle("nav-open");
+  navToggle?.setAttribute("aria-expanded", String(opened));
+}
+
+function closeMobileNav() {
+  document.body.classList.remove("nav-open");
+  navToggle?.setAttribute("aria-expanded", "false");
+}
+
 function route() {
   cleanupExpiredTemp();
   const hash = window.location.hash || "#home";
@@ -834,5 +847,7 @@ function route() {
 
 window.addEventListener("hashchange", route);
 window.addEventListener("beforeunload", () => saveTemp(loadProgress()));
+navToggle?.addEventListener("click", toggleMobileNav);
+document.querySelectorAll(".quick-nav a").forEach((link) => link.addEventListener("click", closeMobileNav));
 startAutoSave();
 route();

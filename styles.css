@@ -65,6 +65,7 @@ button {
 }
 
 .brand,
+.nav-toggle,
 .quick-nav,
 .hero-actions,
 .practice-actions,
@@ -76,6 +77,18 @@ button {
 .brand {
   gap: 10px;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-weight: 900;
+}
+
+.nav-toggle {
+  display: none;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 2px solid #253042;
+  border-radius: 8px;
+  background: var(--sun);
+  box-shadow: 2px 2px 0 #253042;
+  color: #253042;
   font-weight: 900;
 }
 
@@ -983,10 +996,22 @@ body.practice-active .control-band {
   body.practice-active .topbar {
     align-items: center;
     flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  body.practice-active .nav-toggle {
+    display: inline-flex;
+    margin-left: auto;
   }
 
   body.practice-active .quick-nav {
     display: none;
+  }
+
+  body.practice-active.nav-open .quick-nav {
+    display: flex;
+    order: 3;
+    flex-basis: 100%;
   }
 
   .app-shell {
@@ -1030,6 +1055,7 @@ body.practice-active .control-band {
     gap: 8px;
     padding: 10px;
     border-width: 2px;
+    background: rgba(232, 249, 239, 0.97);
     box-shadow: 0 8px 24px rgba(35, 48, 66, 0.18);
   }
 
