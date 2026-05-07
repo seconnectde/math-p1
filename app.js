@@ -200,6 +200,7 @@ let questions = [];
 let autoSaveTimer = null;
 let storageWritable = true;
 const memoryRecords = {};
+let controlBandResizeObserver = null;
 
 function numericQuestion(text, answer) {
   return { text, answer: String(answer), inputMode: "numeric" };
@@ -313,6 +314,35 @@ function saveTemp(progress = loadProgress()) {
   updateSaveStatus(saved && storageWritable ? "บันทึกล่าสุดแล้ว" : "บันทึกถาวรไม่ได้ ใช้ข้อมูลชั่วคราวในหน่วยความจำ");
 }
 
+function setPracticeChromeActive(active) {
+  document.body.classList.toggle("practice-active", active);
+  if (controlBandResizeObserver) {
+    controlBandResizeObserver.disconnect();
+    controlBandResizeObserver = null;
+  }
+
+  if (!active) {
+    document.documentElement.style.removeProperty("--control-band-space");
+    return;
+  }
+
+  const controlBand = document.querySelector(".control-band");
+  if (!controlBand) {
+    return;
+  }
+
+  const updateControlBandSpace = () => {
+    const height = Math.ceil(controlBand.getBoundingClientRect().height);
+    document.documentElement.style.setProperty("--control-band-space", `${height + 28}px`);
+  };
+
+  updateControlBandSpace();
+  if ("ResizeObserver" in window) {
+    controlBandResizeObserver = new ResizeObserver(updateControlBandSpace);
+    controlBandResizeObserver.observe(controlBand);
+  }
+}
+
 function getSetProgress(setId) {
   const progress = loadProgress();
   const setProgress = progress[setId] || {};
@@ -376,6 +406,7 @@ function getCompletion(config, setProgress = getSetProgress(config.id)) {
 
 function renderHome() {
   app.replaceChildren(homeTemplate.content.cloneNode(true));
+  setPracticeChromeActive(false);
 
   const setGrid = document.querySelector("#practice-list");
   const progress = loadProgress();
@@ -428,6 +459,7 @@ function renderPractice(setId) {
   const seed = ensureSetSeed(config);
   questions = buildQuestions(config, seed);
   app.replaceChildren(practiceTemplate.content.cloneNode(true));
+  setPracticeChromeActive(true);
 
   document.querySelector("#practiceEyebrow").textContent = `ชุดที่ ${config.id} จาก 10`;
   document.querySelector("#practiceTitle").textContent = config.title;

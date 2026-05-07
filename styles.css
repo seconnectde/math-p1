@@ -146,6 +146,10 @@ button {
   padding: 26px 0 54px;
 }
 
+body.practice-active .app-shell {
+  padding-bottom: calc(var(--control-band-space, 150px) + 54px);
+}
+
 .hero {
   min-height: clamp(520px, 76vh, 690px);
   display: grid;
@@ -646,12 +650,24 @@ button:disabled,
 }
 
 .control-band {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
   margin-top: 18px;
   padding: 16px;
+}
+
+body.practice-active .control-band {
+  position: fixed;
+  z-index: 30;
+  right: max(14px, calc((100vw - 1180px) / 2));
+  bottom: 14px;
+  left: max(14px, calc((100vw - 1180px) / 2));
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
 }
 
 .progress-wrap {
@@ -950,6 +966,28 @@ button:disabled,
   .summary-strip,
   .control-band {
     grid-template-columns: 1fr;
+  }
+
+  body.practice-active .control-band {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  body.practice-active .practice-actions {
+    flex-flow: row nowrap;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+
+  body.practice-active .primary-action,
+  body.practice-active .secondary-action {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .practice-actions,
