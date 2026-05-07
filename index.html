@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>สอนคณิตศาสตร์ ป.1</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="สอนคณิตศาสตร์ ป.1">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>สอนคณิตศาสตร์ ป.1</span>
+      </a>
+      <nav class="quick-nav" aria-label="ชุดแบบฝึก">
+        <a href="#home">หน้าแรก</a>
+        <a href="#set-1">ชุด 1</a>
+        <a href="#set-2">ชุด 2</a>
+        <a href="#set-3">ชุด 3</a>
+        <a href="#set-4">ชุด 4</a>
+        <a href="#set-5">ชุด 5</a>
+        <a href="#set-6">ชุด 6</a>
+        <a href="#set-7">ชุด 7</a>
+        <a href="#set-8">ชุด 8</a>
+        <a href="#set-9">ชุด 9</a>
+        <a href="#set-10">ชุด 10</a>
+      </nav>
+    </header>
+
+    <main id="app" class="app-shell"></main>
+
+    <template id="homeTemplate">
+      <section class="hero" aria-labelledby="homeTitle">
+        <div class="hero-copy">
+          <h1 id="homeTitle">เล่นกับตัวเลขให้สนุกทุกวัน</h1>
+          <p>
+            ฝึกบวก ลบ เปรียบเทียบ ลำดับจำนวน หลักสิบหลักหน่วย รูปทรง เงิน เวลา และโจทย์สั้น ๆ
+            ทั้งหมด 10 ชุด ชุดละ 50 ข้อ
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#set-1">เริ่มชุดแรก</a>
+            <a class="secondary-action" href="#practice-list">ดูทุกชุด</a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="cloud cloud-one"></div>
+          <div class="cloud cloud-two"></div>
+          <div class="hill"></div>
+          <div class="number-orbit">
+            <span>2</span>
+            <span>5</span>
+            <span>9</span>
+          </div>
+          <div class="mascot">
+            <div class="face">
+              <span class="eye left"></span>
+              <span class="eye right"></span>
+              <span class="smile"></span>
+            </div>
+            <div class="body"></div>
+          </div>
+          <div class="block block-a">+</div>
+          <div class="block block-b">=</div>
+          <div class="block block-c">10</div>
+        </div>
+      </section>
+
+      <section class="summary-strip" aria-label="สรุปความคืบหน้า">
+        <div>
+          <strong id="totalDone">0</strong>
+          <span>ข้อที่ทำแล้ว</span>
+        </div>
+        <div>
+          <strong id="totalCorrect">0</strong>
+          <span>ตอบถูก</span>
+        </div>
+        <div>
+          <strong id="bestSet">-</strong>
+          <span>ชุดที่พร้อมที่สุด</span>
+        </div>
+      </section>
+
+      <section id="practice-list" class="set-grid" aria-label="รายการแบบฝึก 10 ชุด"></section>
+    </template>
+
+    <template id="practiceTemplate">
+      <section class="practice-head" aria-labelledby="practiceTitle">
+        <a class="back-link" href="#home">กลับหน้าแรก</a>
+        <div>
+          <p class="eyebrow" id="practiceEyebrow"></p>
+          <h1 id="practiceTitle"></h1>
+          <p id="practiceDescription"></p>
+        </div>
+        <div class="score-panel" aria-live="polite">
+          <span>คะแนน</span>
+          <strong id="scoreText">0/50</strong>
+        </div>
+      </section>
+
+      <section class="control-band" aria-label="เครื่องมือแบบฝึก">
+        <div class="progress-wrap">
+          <span id="progressText">0 จาก 50 ข้อ</span>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+        <div class="practice-actions">
+          <button id="saveNow" class="secondary-action compact" type="button">บันทึกตอนนี้</button>
+          <button id="checkAll" class="primary-action compact" type="button">ตรวจคำตอบ</button>
+          <button id="exportPdf" class="primary-action compact" type="button">Export PDF</button>
+          <button id="randomReset" class="secondary-action compact" type="button">สุ่มโจทย์ใหม่</button>
+          <button id="resetSet" class="secondary-action compact" type="button">เริ่มใหม่</button>
+        </div>
+      </section>
+
+      <section id="saveStatus" class="save-status" aria-live="polite"></section>
+      <section id="setSummary" class="result-summary" aria-live="polite"></section>
+      <section id="questionGrid" class="question-grid" aria-label="คำถาม 50 ข้อ"></section>
+      <nav class="bottom-nav" aria-label="ไปชุดถัดไป">
+        <a id="prevSet" class="secondary-action compact" href="#home">ชุดก่อนหน้า</a>
+        <a id="nextSet" class="primary-action compact" href="#home">ชุดถัดไป</a>
+      </nav>
+    </template>
+
+    <section id="printReport" class="print-report" aria-hidden="true"></section>
+
+    <script src="app.js"></script>
+  </body>
+</html>
