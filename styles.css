@@ -65,7 +65,7 @@ button {
 }
 
 .brand,
-.nav-toggle,
+.icon-toggle,
 .quick-nav,
 .hero-actions,
 .practice-actions,
@@ -80,16 +80,38 @@ button {
   font-weight: 900;
 }
 
-.nav-toggle {
+.icon-toggle {
   display: none;
+  width: 38px;
   min-height: 34px;
-  padding: 6px 10px;
+  justify-content: center;
+  padding: 6px;
   border: 2px solid #253042;
   border-radius: 8px;
   background: var(--sun);
   box-shadow: 2px 2px 0 #253042;
   color: #253042;
   font-weight: 900;
+}
+
+.icon-toggle span,
+.icon-toggle::before,
+.icon-toggle::after {
+  display: block;
+  width: 18px;
+  height: 3px;
+  border-radius: 99px;
+  background: currentColor;
+}
+
+.icon-toggle {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.icon-toggle::before,
+.icon-toggle::after {
+  content: "";
 }
 
 .brand-mark {
@@ -1052,6 +1074,7 @@ body.practice-active .control-band {
     right: 10px;
     bottom: 8px;
     left: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
     padding: 10px;
     border-width: 2px;
@@ -1071,11 +1094,21 @@ body.practice-active .control-band {
     border-width: 2px;
   }
 
+  body.practice-active .actions-toggle {
+    display: inline-flex;
+  }
+
   body.practice-active .practice-actions {
+    display: none;
+    grid-column: 1 / -1;
     flex-flow: row nowrap;
     align-items: center;
     overflow-x: auto;
     padding-bottom: 3px;
+  }
+
+  body.practice-active.actions-open .practice-actions {
+    display: flex;
   }
 
   body.practice-active .primary-action,

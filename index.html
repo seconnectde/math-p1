@@ -12,8 +12,8 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span>สอนคณิตศาสตร์ ป.1</span>
       </a>
-      <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="quickNav">
-        ชุด
+      <button id="navToggle" class="icon-toggle nav-toggle" type="button" aria-label="เปิดเมนูเลือกชุด" aria-expanded="false" aria-controls="quickNav">
+        <span aria-hidden="true"></span>
       </button>
       <nav id="quickNav" class="quick-nav" aria-label="ชุดแบบฝึก">
         <a href="#home">หน้าแรก</a>
@@ -109,7 +109,10 @@
             <div id="progressBar" class="progress-bar"></div>
           </div>
         </div>
-        <div class="practice-actions">
+        <button id="actionsToggle" class="icon-toggle actions-toggle" type="button" aria-label="เปิดเมนูปุ่มแบบฝึก" aria-expanded="false" aria-controls="practiceActions">
+          <span aria-hidden="true"></span>
+        </button>
+        <div id="practiceActions" class="practice-actions">
           <button id="saveNow" class="secondary-action compact" type="button">บันทึกตอนนี้</button>
           <button id="checkAll" class="primary-action compact" type="button">ตรวจคำตอบ</button>
           <button id="exportPdf" class="primary-action compact" type="button">Export PDF</button>

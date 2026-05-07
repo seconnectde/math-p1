@@ -318,6 +318,7 @@ function saveTemp(progress = loadProgress()) {
 function setPracticeChromeActive(active) {
   document.body.classList.toggle("practice-active", active);
   document.body.classList.remove("nav-open");
+  document.body.classList.remove("actions-open");
   navToggle?.setAttribute("aria-expanded", "false");
   if (controlBandResizeObserver) {
     controlBandResizeObserver.disconnect();
@@ -484,6 +485,7 @@ function renderPractice(setId) {
   document.querySelector("#exportPdf").addEventListener("click", () => exportCurrentSet(config));
   document.querySelector("#randomReset").addEventListener("click", () => resetWithNewQuestions(config));
   document.querySelector("#resetSet").addEventListener("click", () => resetCurrentSet(config));
+  document.querySelector("#actionsToggle").addEventListener("click", togglePracticeActions);
 }
 
 function renderQuestions(config) {
@@ -826,6 +828,11 @@ function updateActiveNav(hash) {
 function toggleMobileNav() {
   const opened = document.body.classList.toggle("nav-open");
   navToggle?.setAttribute("aria-expanded", String(opened));
+}
+
+function togglePracticeActions() {
+  const opened = document.body.classList.toggle("actions-open");
+  document.querySelector("#actionsToggle")?.setAttribute("aria-expanded", String(opened));
 }
 
 function closeMobileNav() {
